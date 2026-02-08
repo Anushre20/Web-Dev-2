@@ -22,7 +22,8 @@ import { Button } from "@/components/ui/button";
 import { generateCode } from "@/services/mockAI";
 import { toast } from "sonner";
 import { MultiFrameworkPreview } from "@/components/MultiFrameworkPreview";
-import { ComponentModal } from "@/components/ComponentModal";
+import { HistorySidebar } from "@/components/HistorySidebar";
+import { useComponentHistory } from "@/hooks/useComponentHistory";
 
 const GeneratorPage = () => {
   // State for the prompt input
@@ -41,7 +42,7 @@ const GeneratorPage = () => {
   // State for generated code output
   const [generatedCode, setGeneratedCode] =
   useState<Record<Framework, string> | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addComponent } = useComponentHistory();
   
   // Loading state while generating
   const [isLoading, setIsLoading] = useState(false);
@@ -66,6 +67,14 @@ const GeneratorPage = () => {
       // Call the mock AI service (will be replaced with real API)
       const result = await generateCode(prompt);
       setGeneratedCode(result);
+      addComponent({
+        name: "Generated Component",
+        prompt,
+        framework,
+        code: result[framework],
+        favorite: false,
+    });
+
       toast.success("Component generated successfully!");
     } catch (error) {
       toast.error("Failed to generate component. Please try again.");
@@ -210,13 +219,12 @@ const GeneratorPage = () => {
           </p>
         </div>
       </footer>
-      {generatedCode && (
-  <ComponentModal
-    open={isModalOpen}
-    code={generatedCode[framework]}
-    onClose={() => setIsModalOpen(false)}
-  />
-)}
+      {/* History Sidebar */}
+      <HistorySidebar
+        onSelectComponent={(code) =>
+          setGeneratedCode({ ...generatedCode!, [framework]: code })
+        }
+      />
     </div>
   );
 };
