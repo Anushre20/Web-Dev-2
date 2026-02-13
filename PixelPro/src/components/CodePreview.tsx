@@ -9,6 +9,7 @@ import { Check, Copy, Code2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { ExportDropdown }  from "./ExportDropdown"; // [1] Import the new component
+import useKeyboardShortcuts from "@/hooks/useKeyboardShortcuts";
 
 interface CodePreviewProps {
   code: string;
@@ -57,6 +58,10 @@ export const CodePreview = ({ code, framework }: CodePreviewProps) => {
   }
 };
 
+  const clearSelection = () => {
+  setSelectedLines(new Set());
+};
+
 
   const getLanguageLabel = () => {
     switch (framework) {
@@ -92,6 +97,12 @@ const toggleLineSelection = (lineNumber: number) => {
     return updated;
   });
 };
+
+  useKeyboardShortcuts({
+  onGenerate: () => {},
+  onCopy: handleCopy,
+  onClear: clearSelection,
+});
 
   return (
     <div className="animate-fade-in-up">
@@ -136,9 +147,11 @@ const toggleLineSelection = (lineNumber: number) => {
     </span>
   ) : (
     <span className="flex items-center gap-2">
-      <Copy className="w-4 h-4" />
-      Copy
-    </span>
+  <Copy className="w-4 h-4" />
+  Copy
+  <span className="text-xs opacity-60">(Ctrl + C)</span>
+</span>
+
   )}
 </>
 
